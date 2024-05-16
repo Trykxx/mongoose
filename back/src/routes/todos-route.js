@@ -118,7 +118,7 @@ todosRoute.delete("/:id", async (req, res) => {
 // 2. Récuperer la tache avec ID
   const todosRecup = await TodoModel.findById(urlId);
 
-// 3. 404 si ell n'existe pas
+// 3. 404 si elle n'existe pas
   if (!todosRecup) {
     return res.status(400).json({ error: "La todo n'existe pas" });
 
@@ -130,3 +130,74 @@ todosRoute.delete("/:id", async (req, res) => {
     return res.end("Todo supprimé");
   }
 });
+
+//* operation sur les listes -> Ajouter une todo a un element
+todosRoute.post("/:id/todo",async (req,res)=>{
+    const todoListId = req.params.id
+    const todoTitle = req.body.title
+
+    const todoList = await TodoModel.findById(todoListId);
+
+    if (!todoList) {
+    return res.status(400).json({ error: "La todo n'existe pas" });
+    }
+
+    todoList.todos.push({title:todoTitle})
+    await todoList.save()
+
+    return res.json(todoList)
+})
+
+//* recuperer une todo d'un element
+todosRoute.get("/:listID/todo/:todoID", async(req,res)=>{
+    const{ listID, todoID} = req.params
+    const todoList = await TodoModel.findById(listID)
+
+    if(!todoList){ return req.status(404).json({error: "Todolist introuvable"})}
+
+    const todo = todoList.todos.id(todoID)
+
+    return res.json(todo)
+})
+
+//* Modifier une todo
+todosRoute.put("/:listID/todo/:todoID", async(req,res)=>{
+    const{ listID, todoID} = req.params
+    const{ title, isDone} = req.body
+
+    const todoList = await TodoModel.findById(listID)
+
+    if(!todoList){ return req.status(404).json({error: "Todolist introuvable"})}
+
+    const todo = todoList.todos.id(todoID)
+    //! changer obligatoirement titre et isDone
+    // todo.set({
+    //     title:title,
+    //     isDone:isDone
+    // })
+    //! changer soit l'un soit l'autre
+    todo.set({
+        title: title ? title : todo.title,
+        isDone: isDone != undefined ? isDone : todo.isDone
+    })
+    await todoList.save()
+    return res.json({message:"Todo modifié"})
+})
+
+todosRoute.delete("/:listID/todo/:todoID", async(req,res)=>{
+    const{ listID, todoID} = req.params
+
+    const todoList = await TodoModel.findById(listID)
+
+    if(!todoList){
+        return req.status(404).json({error: "Todolist introuvable"})
+    }
+
+    const todo = todoList.todos.id(todoID)
+
+    todoList.todos.pull(todo)
+    await todoList.save()
+
+    return res.json({message:'Tache supprimé'})
+})
+
