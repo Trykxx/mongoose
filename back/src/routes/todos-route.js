@@ -198,6 +198,6 @@ todosRoute.delete("/:listID/todo/:todoID", async(req,res)=>{
     todoList.todos.pull(todo)
     await todoList.save()
 
-    return res.json({message:'Tache supprimé'})
+    return res.json({message:`Tache avec l'id: ${todoID} supprimé`})
 })
 
