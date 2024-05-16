@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose"
 import { TodoModel } from "./database/todo-list.js";
 import { todosRoute } from "./routes/todos-route.js";
+import fs from "fs"
 
 const MONGODB_URI = "mongodb://127.0.0.1:27017/todos";
 const PORT = 3010;
