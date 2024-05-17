@@ -34,10 +34,21 @@ export function TodoList() {
       },
     });
 
-    await reponse.json();
+    const newTodo = await reponse.json();
+    setlisteTodo([...listeTodo, newTodo.todo])
+    //! ...listeTodo = recupere l'ancien tableau puis on rajoute le nouveau
+
     return setMessage({ success: true, content: "Tâche ajoutée" });
   }
-console.log(listeTodo);
+
+  async function deleteTodo(id){
+    const reponse = await fetch('/api/todos/' + id, {
+        method:'DELETE'
+    })
+    const newTodosList = listeTodo.filter((ele)=>{ return ele._id != id})
+    console.log(newTodosList);
+    setlisteTodo(newTodosList)
+  }
   return (
     <div>
       <input
@@ -49,7 +60,8 @@ console.log(listeTodo);
       <p style={{ color: success ? "green" : "red" }}>{content}</p>
       <ul>
         {listeTodo.map((taches) => (
-          <li key={taches._id}>{taches.title}</li>
+          <li key={taches._id}>{taches.title} <button onClick={()=>deleteTodo(taches._id)}>Supprimer</button>
+          </li>
         ))}
       </ul>
     </div>
@@ -60,3 +72,9 @@ console.log(listeTodo);
 // Utiliser le useEffect et fetch pour récuperer les listes de tache
 // Stocker les liste de taches dans une variable d'état
 // Utiliser un boucle pour afficher chaque liste de taches
+
+//* Exercice:
+// 1. Ajouter une bouton supprimer pour chaque tache
+// 2. Créer une fonction qui reçoit l'id de la tache
+// 3. Utiliser fetch pour envoyer une requete DELETE a la back end
+// 4. Lier cette fonction avec les bouton de chaque taches
