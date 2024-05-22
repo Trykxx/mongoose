@@ -1,8 +1,10 @@
 import express from "express";
 import { UserModel } from "../database/user.js";
 import bcrypt from "bcrypt";
+import jsonwebtoken from "jsonwebtoken";
 
 export const usersRouter = express.Router();
+const SECRET_KEY = "azerty";
 
 usersRouter.post("/inscription", async (req, res) => {
   console.log(req.body);
@@ -55,24 +57,45 @@ usersRouter.post("/connexion", async (req, res) => {
   if (!mailBody || !passwordBody) {
     return res.status(401).json({ error: "Email et mot de passe obligatoire" });
   }
-console.log(passwordBody);
-  if (!mailBody.includes('@') || passwordBody.length < 6) {
+  console.log(passwordBody);
+  if (!mailBody.includes("@") || passwordBody.length < 6) {
     return res.status(401).json({ error: "Données incorrectes" });
   }
   console.log(mailBody);
   console.log(passwordBody);
 
-  const [userFromDB] = await UserModel.find({ email:mailBody  });
+  const [userFromDB] = await UserModel.find({ email: mailBody });
   console.log(userFromDB);
 
   if (!userFromDB) {
     return res.status(401).json({ error: "Utilisateur introuvable" });
   }
 
-  const isPasswordValid = await bcrypt.compare(passwordBody, userFromDB.hashedPassword);
+  const isPasswordValid = await bcrypt.compare(
+    passwordBody,
+    userFromDB.hashedPassword
+  );
 
   if (!isPasswordValid) {
     return res.status(401).json({ error: "Données incorrectes" });
   }
-  return res.json({user: userFromDB});
+
+  const access_token = jsonwebtoken.sign({ id: userFromDB._id }, SECRET_KEY);
+  console.log(access_token);
+  return res.json({ user: userFromDB, access_token });
+});
+
+usersRouter.get("/me", async (req, res) => {
+  const access_token = req.headers.authorization;
+  console.log(req.headers);
+
+  const token = access_token.split(' ')[1]
+  const verifiedToken = jsonwebtoken.verify(token, SECRET_KEY);
+
+  if (!verifiedToken) {
+    return res.status(401).json({ error: "Token invalide" });
+  }
+
+  const user = await UserModel.findById(verifiedToken.id );
+  return res.json({ user });
 });
