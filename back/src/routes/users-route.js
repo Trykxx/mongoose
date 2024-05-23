@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
 
 export const usersRouter = express.Router();
+
 const SECRET_KEY = "azerty";
 
 usersRouter.post("/inscription", async (req, res) => {
@@ -57,12 +58,10 @@ usersRouter.post("/connexion", async (req, res) => {
   if (!mailBody || !passwordBody) {
     return res.status(401).json({ error: "Email et mot de passe obligatoire" });
   }
-  console.log(passwordBody);
+
   if (!mailBody.includes("@") || passwordBody.length < 6) {
     return res.status(401).json({ error: "Données incorrectes" });
   }
-  console.log(mailBody);
-  console.log(passwordBody);
 
   const [userFromDB] = await UserModel.find({ email: mailBody });
   console.log(userFromDB);
@@ -89,13 +88,49 @@ usersRouter.get("/me", async (req, res) => {
   const access_token = req.headers.authorization;
   console.log(req.headers);
 
-  const token = access_token.split(' ')[1]
+  const token = access_token.split(" ")[1];
   const verifiedToken = jsonwebtoken.verify(token, SECRET_KEY);
 
   if (!verifiedToken) {
     return res.status(401).json({ error: "Token invalide" });
   }
 
-  const user = await UserModel.findById(verifiedToken.id );
+  const user = await UserModel.findById(verifiedToken.id);
   return res.json({ user });
 });
+
+//! Etape 12: Back
+usersRouter.put("/me", async (req, res) => {
+  const newUsername = req.body.username;
+  const newAvatar = req.body.avatarUrl;
+
+  if (!newUsername || !newAvatar) {
+    return res.status(400).json({ error: "Données invalides" });
+  }
+
+  const access_token = req.headers.authorization;
+  console.log("Authorization Header:", access_token);
+  if (!access_token) {
+    return res.status(401).json({ error: "Token manquant" });
+  }
+
+  const token = access_token.split(" ")[1];
+  const verifiedToken = jsonwebtoken.verify(token, SECRET_KEY);
+
+  if (!verifiedToken) {
+    return res.status(401).json({ error: "Token invalide !" });
+  }
+
+  const user = await UserModel.findById(verifiedToken.id);
+  if (!user) {
+    return res.status(404).json({ error: "Utilisateur introuvable" });
+  }
+
+  user.username = newUsername;
+  user.avatarUrl = newAvatar;
+
+  await user.save();
+
+  return res.json({ user });
+});
+

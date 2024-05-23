@@ -23,7 +23,6 @@ function App() {
         }
       })
       const data = await reponse.json()
-      console.log(data);
       setUser(data.user)
     }
     getUser()

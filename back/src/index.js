@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { TodoModel } from "./database/todo-list.js";
 import { todosRoute } from "./routes/todos-route.js";
 import { usersRouter } from "./routes/users-route.js";
-
+import { postsRouter } from "./routes/posts-route.js";
 const MONGODB_URI = "mongodb://127.0.0.1:27017/todos";
 const PORT = 3010;
 
@@ -12,21 +12,14 @@ server.use(express.json());
 
 server.use("/api/todos", todosRoute); //*pour tous les url qui commencent par /api/todos il va executer le router
 server.use("/api/users", usersRouter);
+server.use("/api", postsRouter);
+
 // Ajouter une sur l'url "/api/ping" method GET
 // Retourne json avec "pong"
 server.get("/api/ping", (req, res) => {
   return res.json({ message: "Pong" });
 });
 
-// server.get("/test",(req,res)=>{
-//     const newTodo= new TodoModel({
-//         title:'Titre test',
-//         createdAt: new Date(),
-//     })
-
-//     await newTodo.save()
-//     return res.json({res:"Message ajouté"})
-// })
 
 server.listen(PORT, function () {
   console.log("Serveur lancé");

@@ -5,6 +5,7 @@ const UserSchema = mongoose.Schema({
   email: { type: String, required: true, unique: true },
   username: { type: String, required: true },
   hashedPassword: { type: String, required: true },
+  avatarUrl:{ type: String}
 });
 
 // * Export the model to be used elsewhere:
