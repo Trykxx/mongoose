@@ -5,68 +5,74 @@
 // input pour confirmer password - égale a password: Erreur: Les Mots de passe sont différent !
 // bouton pour valider le formulaire
 
-import { useState } from "react"
+import { useState } from "react";
 
-export default function Inscription(){
+export default function Inscription() {
+  const [mail, setMail] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [username, setUsername] = useState("");
 
-    const [mail, setMail] = useState('');
-    const [emailError, setEmailError] = useState('');
-    const [username, setUsername] = useState('');
+  //! Récuperations des valeurs saisies
 
-//! Récuperations des valeurs saisies
+  const EmailValue = (e) => {
+    const email = e.target.value;
+    setMail(email);
+    validateEmail(email);
+  };
 
-    const EmailValue = (e) =>{
-       const email = e.target.value
-       setMail(email)
-       validateEmail(email);
+  const UsernameValue = (e) => {
+    const value = e.target.value;
+    setUsername(value);
+  };
+
+  //! Vérifications des valeurs saisies
+
+  const validateEmail = (email) => {
+    const regex = /\S+@\S+\.\S+/;
+    if (!regex.test(email)) {
+      setEmailError("Email incorrect !");
+    } else {
+      setEmailError("");
     }
+  };
 
-    const UsernameValue = (e) => {
-        const value = e.target.value;
-        setUsername(value);
-      };
+  const validateUsername = (username) => {};
 
-//! Vérifications des valeurs saisies
+  //! Affichages d'erreur si il y en a
 
-    const validateEmail = (email) => {
-        const regex = /\S+@\S+\.\S+/;
-        if (!regex.test(email)) {
-          setEmailError('Email incorrect !');
-        } else {
-          setEmailError('');
-        }
-      };
-
-    const validateUsername = (username)=>{
-
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (emailError) {
+      alert("Veuillez corriger les erreurs avant de soumettre le formulaire.");
+    } else {
+      console.log("Form submitted:", { mail });
     }
+  };
 
-//! Affichages d'erreur si il y en a
+  return (
+    <>
+      {" "}
+      <h2>Inscription</h2>
+      <div>
 
-      const handleSubmit = (e) => {
-        e.preventDefault();
-        if (emailError) {
-          alert('Veuillez corriger les erreurs avant de soumettre le formulaire.');
-        } else {
-          console.log('Form submitted:', { mail });
-        }
-      };
+        <form style={{ display: "flex", flexDirection: 'column',gap:'10px' }}>
+          <input
+            type="email"
+            placeholder="Entrez votre email"
+            onChange={EmailValue}
+            required
+          />
+          <input
+            type="username"
+            placeholder="Entrez votre username"
+            onChange={UsernameValue}
+          />
+          <input type="password" placeholder="Entrez votre mot de passe" />
+          <input type="password" placeholder="Confirmez votre mot de passe" />
 
-
-
-    return(
-    <div>
-        <h2>Inscription</h2>
-        <form>
-            <input type="email" placeholder="Entrez votre email" onChange={EmailValue}/>
-            <input type="username" placeholder="Entrez votre username" onChange={UsernameValue}/>
-            <input type="password" placeholder="Entrez votre mot de passe"/>
-            <input type="password" placeholder="Confirmez votre mot de passe"/>
-
-            <input type="submit" value="Valider" onClick={handleSubmit}/>
-
+          <input type="submit" value="Valider" onClick={handleSubmit} />
         </form>
-
-    </div>
-    )
+      </div>
+    </>
+  );
 }
