@@ -109,7 +109,6 @@ usersRouter.put("/me", async (req, res) => {
   }
 
   const access_token = req.headers.authorization;
-  console.log("Authorization Header:", access_token);
   if (!access_token) {
     return res.status(401).json({ error: "Token manquant" });
   }
